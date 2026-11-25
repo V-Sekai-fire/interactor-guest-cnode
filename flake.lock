@@ -1,0 +1,64 @@
+{
+  "nodes": {
+    "entities-godot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793473204,
+        "narHash": "sha256-NUce4ybj2MFZecsn9TcgknWALfGUBT/pmF8HpPCY4OY=",
+        "owner": "V-Sekai-fire",
+        "repo": "entities-godot",
+        "rev": "0bac82758eadc9fc00b2c80753f0dce3304d50bc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "V-Sekai-fire",
+        "repo": "entities-godot",
+        "rev": "0bac82758eadc9fc00b2c80753f0dce3304d50bc",
+        "type": "github"
+      }
+    },
+    "godot-sandbox": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794094520,
+        "narHash": "sha256-xOSSO6aID7F9QBKEKzbhKSMcHhsDAOp275TjFNFbK2U=",
+        "ref": "refs/heads/main",
+        "rev": "9fadcbae527acd837067484a41b38292b45972e6",
+        "revCount": 1283,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/V-Sekai-fire/godot-sandbox"
+      },
+      "original": {
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/V-Sekai-fire/godot-sandbox"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1795371335,
+        "narHash": "sha256-oa2P5WZer1A4wuhatl92JyHHEjrrOdIyuvTuI5LUi9Q=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "619c39f6eac5d1ed6b8f073a9414baf7034b2356",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "entities-godot": "entities-godot",
+        "godot-sandbox": "godot-sandbox",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

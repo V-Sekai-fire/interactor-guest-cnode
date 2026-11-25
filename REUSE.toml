@@ -1,0 +1,6 @@
+version = 1
+
+[[annotations]]
+path = ["README.md", ".gitignore", "flake.lock", "flake.nix", "nix/**", "src/**", "project/**", "docs/**", "service/**", "REUSE.toml"]
+SPDX-FileCopyrightText = "2026 K. S. Ernest (iFire) Lee"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"

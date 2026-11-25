@@ -1,0 +1,15 @@
+; SPDX-FileCopyrightText: 2026 K. S. Ernest (iFire) Lee
+; SPDX-License-Identifier: Apache-2.0 OR MIT
+config_version=5
+
+[application]
+config/name="guest-cnode console"
+run/main_scene="res://main.tscn"
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[rendering]
+renderer/rendering_method="forward_plus"
+rendering_device/driver.linuxbsd="vulkan"

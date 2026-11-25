@@ -1,0 +1,107 @@
+asyncapi: 3.1.0
+info:
+  title: Guest C node
+  version: 0.1.0
+  description: >
+    guest-cnode loads a godot-sandbox guest ELF into libgodot and serves requests over Erlang distribution, as an ei C node on
+    127.0.0.1 with a shared cookie (env GUEST_CNODE_COOKIE) and a long name (env GUEST_CNODE_NAME, default guest). It publishes with
+    epmd only when libgodot has started. It runs requests one at a time on the thread that drives the Godot main loop, because a
+    vmcall must run there. Message shape shared with the voice, Bonsai and mujoco nodes: see docs/message-shape.md. The transport is
+    Erlang distribution, which has no AsyncAPI binding; the server protocol below is named erlang-distribution and the terms are
+    given as JSON schema of their Erlang values (atoms and binaries are strings, tuples are arrays).
+  license:
+    name: Apache-2.0 OR MIT
+servers:
+  local:
+    host: 127.0.0.1
+    protocol: erlang-distribution
+    description: Long name guest@127.0.0.1, registered send to the name guest.
+defaultContentType: application/x-erlang-term
+channels:
+  requests:
+    address: guest
+    messages:
+      ping: {$ref: '#/components/messages/ping'}
+      info: {$ref: '#/components/messages/info'}
+      load: {$ref: '#/components/messages/load'}
+      vmcall: {$ref: '#/components/messages/vmcall'}
+      cancel: {$ref: '#/components/messages/cancel'}
+      batch: {$ref: '#/components/messages/batch'}
+      call: {$ref: '#/components/messages/call'}
+  replies:
+    address: sender-pid
+    messages:
+      ok: {$ref: '#/components/messages/ok'}
+      error: {$ref: '#/components/messages/error'}
+operations:
+  receiveRequest:
+    action: receive
+    channel: {$ref: '#/channels/requests'}
+  sendReply:
+    action: send
+    channel: {$ref: '#/channels/replies'}
+x-state-machine:
+  initial: unloaded
+  states: [unloaded, loaded]
+  transitions:
+    - {from: unloaded, on: load, to: loaded}
+    - {from: loaded, on: load, to: loaded}
+    - {from: loaded, on: vmcall, to: same}
+    - {from: loaded, on: call, to: same}
+    - {from: loaded, on: batch, to: same}
+    - {from: unloaded, on: ping, to: same}
+    - {from: loaded, on: ping, to: same}
+    - {from: unloaded, on: info, to: same}
+    - {from: loaded, on: info, to: same}
+    - {from: unloaded, on: cancel, to: same}
+    - {from: loaded, on: cancel, to: same}
+components:
+  messages:
+    ping:
+      summary: "{ping, Ref, Arg}; reply {Ref, {ok, pong}}"
+      payload: {$ref: '#/components/schemas/request'}
+    info:
+      summary: "{info, Ref, Arg}; reply {Ref, {ok, #{name, version, status, commands}}}"
+      payload: {$ref: '#/components/schemas/request'}
+    load:
+      summary: "{load, Ref, ElfBinary}; reply {Ref, {ok, loaded}}; the guest must load and Godot must have the godot_sandbox extension"
+      payload: {$ref: '#/components/schemas/request'}
+    vmcall:
+      summary: "{vmcall, Ref, {FunctionBinary, [Arg]}}; Arg is integer, float, true, false or binary; at most 16; reply {Ref, {ok, Term}}"
+      payload: {$ref: '#/components/schemas/request'}
+    cancel:
+      summary: "{cancel, Ref2, Ref}; reply {Ref2, {error, <<\"not cancellable\">>}}: no request outlives its reply"
+      payload: {$ref: '#/components/schemas/request'}
+    batch:
+      summary: "{batch, Ref, {Command, [ItemArg]}}; reply {Ref, {ok, [Term]}}, one per item; one refused item refuses the whole batch; no nesting. Written before the code: not yet implemented."
+      payload: {$ref: '#/components/schemas/request'}
+    call:
+      summary: "{call, Ref, {Symbol, Args}}; Args are integers, {in, Binary} and {out, Size}; reply {Ref, {ok, {Ret, [Binary]}}}. Written before the code: not yet implemented."
+      payload: {$ref: '#/components/schemas/request'}
+    ok:
+      summary: "{Ref, {ok, Term}}; Term is integer, float, boolean, nil or the guest value as a text binary"
+      payload: {$ref: '#/components/schemas/reply'}
+    error:
+      summary: "{Ref, {error, Reason}}; Reason is a binary"
+      payload: {$ref: '#/components/schemas/reply'}
+  schemas:
+    request:
+      type: array
+      description: "{Command, Ref, Arg}"
+      prefixItems:
+        - {type: string, enum: [ping, info, load, vmcall, cancel, batch, call]}
+        - {type: string, description: Erlang reference}
+        - {description: Command argument}
+      minItems: 3
+      maxItems: 3
+    reply:
+      type: array
+      description: "{Ref, {ok, Term} | {error, Reason}}"
+      prefixItems:
+        - {type: string, description: Erlang reference of the request}
+        - type: array
+          prefixItems:
+            - {type: string, enum: [ok, error]}
+            - {description: "Term, or Reason as a binary"}
+      minItems: 2
+      maxItems: 2
