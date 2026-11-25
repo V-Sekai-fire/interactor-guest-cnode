@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 K. S. Ernest (iFire) Lee
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 extends Control
+const Tokens = preload("res://tokens.gd")
 # Console screen: GPU, guest and call log on the left and centre, the design tokens below.
 # The C node reaches this node as the engine singleton "Console".
 

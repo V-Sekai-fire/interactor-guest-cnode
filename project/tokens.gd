@@ -1,6 +1,5 @@
 # SPDX-FileCopyrightText: 2026 K. S. Ernest (iFire) Lee
 # SPDX-License-Identifier: Apache-2.0 OR MIT
-class_name Tokens
 # Design tokens for the console: one surface ramp, one accent, three states.
 const SURFACE_0 := Color("0e1116")
 const SURFACE_1 := Color("161b22")

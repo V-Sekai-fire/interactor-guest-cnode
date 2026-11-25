@@ -15,8 +15,8 @@ Mission step: the shared guest host as a NixOS flake and as win64 (RFD66606-2360
 | `project/` | Godot console screen: GPU adapter, guest, call log, design tokens. The node reaches it as the engine singleton `Console` |
 | `service/asyncapi.yaml` | AsyncAPI 3.1, passes `tools/asyncapi_check.exs` of interactor-hair-cards-viewer; carries `x-state-machine` |
 | `docs/message-shape.md` | the shape agreed with the voice, Bonsai and mujoco nodes |
-| win64 | not started. Toolchain agreed: llvm-mingw. `ei` for mingw is being built by the mujoco session from the OTP 29.1.2 source |
-| Steam Deck proof | not passed (see below) |
+| win64 | not started. Toolchain agreed: llvm-mingw. `ei` for mingw works: `tools/build_ei_mingw.exs` on branch `dev/win64-ei` of interactor-mujoco-sandbox-demo-guest compiles the erl_interface sources from the OTP zip into `libei.a` (the MSVC `ei.lib` does not link with lld). Not yet tested: a real connection on Windows |
+| Steam Deck proof | partly: on the Deck the host starts libgodot on a gamescope X window, loads the console script and prints `guest@127.0.0.1 ready`. Not yet seen: the adapter name on screen, `rd present`, a ping reply |
 | Voice pilot | not started: needs the host to run a guest first |
 
 Not tested: `load` and `vmcall` against a real guest ELF; the console screen; `info` and `cancel` replies.
@@ -36,6 +36,10 @@ Device: Steam Deck over `ssh steamdeck` (AMD GPU, `/dev/dri`, gamescope X server
 ## The `*-guest` repos (41 on 2026-11-25; the first count was 38)
 
 `docs/guests.tsv` lists every `*-guest` repo in V-Sekai-fire with its kind: `elf-cmake` (CMakeLists.txt or build.sh at the root), `sgd-only` (`.sgd` plus `project.godot`, no ELF build; a Godot host runs these directly), `other` (a build shape not yet read: look in `guest/`, `src/`, `tools/`). None has a `flake.nix`. `interactor-mujoco-sandbox-demo-guest` has its own node on `dev/mujoco-raw-cnode`; read it, do not edit it. Done: none. Pilot: `interactor-voice-guest`. Per repo: read AGENTS.md, add `flake.nix` taking this repo as an input and `riscv64-sysroot` and `contract-guest-runtime` as `flake = false` inputs, commit `flake.lock`, run the pre-commit hooks, open a PR over REST.
+
+## Deck run, as measured 2026-11-25
+
+`rundeck.sh` (not in git: it embeds store paths) runs `bwrap --bind ~/guest/nix /nix`, binds `/usr`, `/dev`, `/proc`, `/tmp`, `/sys` and the user runtime dir, sets `HOME` (Erlang needs a writable one), `DISPLAY=:1`, `VK_ICD_FILENAMES` to the closure's Mesa `radeon_icd`, and puts the X libraries on `LD_LIBRARY_PATH`, because Godot dlopens them. Then `epmd -daemon` inside the sandbox and the host. Found: release libgodot refuses `--path` unless built with `disable_path_overrides=no`; `class_name` needs an imported project, so the console uses `preload`; no fontconfig, so the console falls back to the default font.
 
 ## Machine-specific
 
