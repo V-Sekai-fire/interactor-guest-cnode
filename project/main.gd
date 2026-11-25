@@ -53,6 +53,9 @@ func log_line(text: String, level: String = "info") -> void:
 	var colour := {"ok": Tokens.OK, "warn": Tokens.WARN, "fail": Tokens.FAIL, "info": Tokens.TEXT}.get(level, Tokens.TEXT) as Color
 	log_view.append_text("[color=#%s]%s[/color]  [color=#%s]%s[/color]\n" % [Tokens.TEXT_DIM.to_html(false), Time.get_time_string_from_system(), colour.to_html(false), text.replace("[", "[lb]")])
 
+func gpu_info() -> String:
+	return "%s | rd %s | %s" % [RenderingServer.get_video_adapter_name(), "present" if RenderingServer.get_rendering_device() != null else "missing", DisplayServer.get_name()]
+
 func set_guest(name: String, size: int) -> void:
 	guest_value.text = "%s  %d bytes" % [name, size]
 	guest_value.add_theme_color_override("font_color", Tokens.OK)

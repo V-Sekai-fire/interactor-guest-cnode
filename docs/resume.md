@@ -16,7 +16,7 @@ Mission step: the shared guest host as a NixOS flake and as win64 (RFD66606-2360
 | `service/asyncapi.yaml` | AsyncAPI 3.1, passes `tools/asyncapi_check.exs` of interactor-hair-cards-viewer; carries `x-state-machine` |
 | `docs/message-shape.md` | the shape agreed with the voice, Bonsai and mujoco nodes |
 | win64 | not started. Toolchain agreed: llvm-mingw. `ei` for mingw works: `tools/build_ei_mingw.exs` on branch `dev/win64-ei` of interactor-mujoco-sandbox-demo-guest compiles the erl_interface sources from the OTP zip into `libei.a` (the MSVC `ei.lib` does not link with lld). Not yet tested: a real connection on Windows |
-| Steam Deck proof | partly: on the Deck the host starts libgodot on a gamescope X window, loads the console script and prints `guest@127.0.0.1 ready`. Not yet seen: the adapter name on screen, `rd present`, a ping reply |
+| Steam Deck proof | GPU part passed 2026-11-25: `info` returns `gpu => AMD Custom GPU 0932 (RADV VANGOGH) | rd present | X11`; the control (`--rendering-method gl_compatibility --rendering-driver opengl3`) returns `rd missing`. `tools/shape_client.escript` got `{ok,pong}`, the `info` map, `{error,<<"no guest loaded">>}`, `{error,<<"unknown command">>}` and `{error,<<"not cancellable">>}`. Not yet done: loading a guest ELF and a real `vmcall` |
 | Voice pilot | not started: needs the host to run a guest first |
 
 Not tested: `load` and `vmcall` against a real guest ELF; the console screen; `info` and `cancel` replies.

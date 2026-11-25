@@ -116,6 +116,20 @@ static void console_log(const char *text, const char *level) {
   variant_destroy(&args[0]); variant_destroy(&args[1]);
 }
 
+static int console_text(const char *method, char *out, size_t size) {
+  Str cls; Var self, ret; char err[128];
+  name_new(&cls, "Console", 0);
+  GDExtensionObjectPtr console = global_singleton(&cls);
+  if (!console) return -1;
+  object_variant(console, &self);
+  if (call_method(&self, method, NULL, 0, &ret, err, sizeof err)) return -1;
+  Str text; variant_stringify(&ret, &text);
+  GDExtensionInt length = string_to_utf8(&text, out, (GDExtensionInt)size - 1);
+  out[length < 0 ? 0 : length] = 0;
+  variant_destroy(&ret);
+  return 0;
+}
+
 static int load_elf(const char *data, size_t size, char *err, size_t errsize) {
   Str array;
   Var arg, ret, self;
@@ -216,7 +230,8 @@ static void handle(int fd, const erlang_msg *message, ei_x_buff *request) {
     reply(fd, message, ref, ref_size, "ok", NULL, &term); ei_x_free(&term);
   } else if (!strcmp(command, "info")) {
     ei_x_buff term; ei_x_new(&term);
-    ei_x_encode_map_header(&term, 4);
+    ei_x_encode_map_header(&term, 5);
+    { char gpu[256] = "unknown"; console_text("gpu_info", gpu, sizeof gpu); ei_x_encode_atom(&term, "gpu"); ei_x_encode_binary(&term, gpu, (long)strlen(gpu)); }
     ei_x_encode_atom(&term, "name"); ei_x_encode_binary(&term, "guest-cnode", 11);
     ei_x_encode_atom(&term, "version"); ei_x_encode_binary(&term, "0.1.0", 5);
     ei_x_encode_atom(&term, "status"); ei_x_encode_atom(&term, sandbox ? "loaded" : "empty");
